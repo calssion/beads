@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>拼豆图纸生成器</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="container">
+    <h1>🎨 拼豆图纸生成器</h1>
+    <p class="subtitle">上传图片，自动生成 Perler Beads 拼豆图纸</p>
+
+    <div class="controls">
+      <div class="upload-area" id="uploadArea">
+        <input type="file" id="fileInput" accept="image/*" hidden>
+        <p>点击或拖拽图片到此处上传</p>
+      </div>
+
+      <div class="settings">
+        <label>
+          图纸宽度（珠子数）：
+          <input type="number" id="beadWidth" value="64" min="1" max="200">
+        </label>
+        <label>
+          格子大小（像素）：
+          <input type="number" id="cellSize" value="15" min="8" max="40">
+        </label>
+        <label>
+          颜色匹配算法：
+          <select id="algorithm">
+            <option value="ciede2000" selected>CIEDE2000（推荐）</option>
+            <option value="euclidean">RGB 欧几里得距离</option>
+            <option value="weighted">RGB 加权欧几里得距离</option>
+          </select>
+        </label>
+        <button id="generateBtn" disabled>生成图纸</button>
+      </div>
+    </div>
+
+    <div class="preview-section" id="previewSection" style="display:none;">
+      <h2>预览</h2>
+      <p class="bead-info" id="beadInfo"></p>
+      <div class="preview-wrapper">
+        <div class="preview-col">
+          <h3>原图（缩略）</h3>
+          <canvas id="originalCanvas"></canvas>
+        </div>
+        <div class="preview-col preview-col--bead">
+          <h3>拼豆图纸（带色号）</h3>
+          <div class="canvas-scroll-wrapper">
+            <canvas id="beadCanvas"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <div class="action-bar">
+        <button id="downloadBtn" class="btn-download">📥 下载图纸 (PNG)</button>
+      </div>
+
+      <div class="color-summary" id="colorSummary"></div>
+    </div>
+  </div>
+
+  <!-- 隐藏 canvas 用于图像处理 -->
+  <canvas id="hiddenCanvas" style="display:none;"></canvas>
+
+  <script src="js/palette.js"></script>
+  <script src="js/colorMatch.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
