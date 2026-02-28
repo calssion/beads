@@ -375,7 +375,12 @@
 
     previewSec.style.display = 'block';
 
-    // 6. 图纸尺寸说明
+    // 6. 生成缩略图
+    const thumbEl = document.getElementById('beadThumbnail');
+    thumbEl.src = beadCanvas.toDataURL('image/png');
+    thumbEl.style.display = 'block';
+
+    // 7. 图纸尺寸说明
     document.getElementById('beadInfo').textContent =
       `图纸尺寸：横向 ${beadW} 格 × 纵向 ${beadH} 格，共需 ${totalBeads.toLocaleString()} 颗豆子`;
 
