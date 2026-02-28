@@ -60,6 +60,14 @@ h1 {
   font-size: 0.95rem;
 }
 
+.upload-preview {
+  max-width: 100%;
+  max-height: 300px;
+  margin-top: 1rem;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+}
+
 /* ---------- 设置面板 ---------- */
 .settings {
   flex: 1 1 240px;
@@ -158,13 +166,14 @@ h1 {
 
 /* ---------- 缩略图 ---------- */
 .thumbnail-section {
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
+  text-align: center;
 }
 
-.thumbnail-section h4 {
-  font-size: 0.95rem;
+.thumbnail-section h3 {
+  font-size: 1rem;
   color: #555;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.75rem;
 }
 
 .thumbnail-wrap {
@@ -172,14 +181,24 @@ h1 {
   border: 1px solid #ddd;
   border-radius: 8px;
   padding: 12px;
-  text-align: center;
-  margin-bottom: 1rem;
+  display: inline-block;
+  margin: 0 auto;
 }
 
 .thumbnail-wrap img {
   max-width: 100%;
   max-height: 50vh;
   border-radius: 4px;
+}
+
+.bead-detail-section {
+  margin-bottom: 1.5rem;
+}
+
+.bead-detail-section h3 {
+  font-size: 1rem;
+  color: #555;
+  margin-bottom: 0.75rem;
 }
 
 .preview-col--bead h4 {

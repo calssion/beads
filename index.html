@@ -15,6 +15,7 @@
       <div class="upload-area" id="uploadArea">
         <input type="file" id="fileInput" accept="image/*" hidden>
         <p>点击或拖拽图片到此处上传</p>
+        <img id="uploadPreview" class="upload-preview" style="display:none;" />
       </div>
 
       <div class="settings">
@@ -46,18 +47,19 @@
           <h3>原图（缩略）</h3>
           <canvas id="originalCanvas"></canvas>
         </div>
-        <div class="preview-col preview-col--bead">
-          <h3>拼豆图纸（带色号）</h3>
-          <div class="thumbnail-section">
-            <h4>图纸预览</h4>
-            <div class="thumbnail-wrap">
-              <img id="beadThumbnail" alt="图纸缩略图" style="display:none;" />
-            </div>
-          </div>
-          <h4>图纸详情（可滚动查看）</h4>
-          <div class="canvas-scroll-wrapper">
-            <canvas id="beadCanvas"></canvas>
-          </div>
+      </div>
+
+      <div class="thumbnail-section">
+        <h3>图纸预览</h3>
+        <div class="thumbnail-wrap">
+          <img id="beadThumbnail" alt="图纸缩略图" style="display:none;" />
+        </div>
+      </div>
+
+      <div class="bead-detail-section">
+        <h3>拼豆图纸（带色号） — 可滚动查看</h3>
+        <div class="canvas-scroll-wrapper">
+          <canvas id="beadCanvas"></canvas>
         </div>
       </div>
 

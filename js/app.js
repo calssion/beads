@@ -195,6 +195,9 @@
       img.onload = () => {
         loadedImage = img;
         uploadArea.querySelector('p').textContent = `✅ ${file.name} (${img.width}×${img.height})`;
+        const preview = document.getElementById('uploadPreview');
+        preview.src = e.target.result;
+        preview.style.display = 'block';
         generateBtn.disabled = false;
       };
       img.src = e.target.result;
