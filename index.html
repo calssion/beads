@@ -23,8 +23,8 @@
           <input type="number" id="beadWidth" value="64" min="1" max="200">
         </label>
         <label>
-          格子大小（像素）：
-          <input type="number" id="cellSize" value="15" min="8" max="40">
+          格子大小（像素，只影响图纸显示，不影响实际珠子数量）：
+          <input type="number" id="cellSize" value="25" min="8" max="40">
         </label>
         <label>
           颜色匹配算法：
@@ -56,6 +56,8 @@
 
       <div class="action-bar">
         <button id="downloadBtn" class="btn-download">📥 下载图纸 (PNG)</button>
+        <button id="downloadCsvBtn" class="btn-export">📄 导出统计 (CSV)</button>
+        <button id="downloadStatsImgBtn" class="btn-export">🖼️ 导出统计图 (PNG)</button>
       </div>
 
       <div class="color-summary" id="colorSummary"></div>

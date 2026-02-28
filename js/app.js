@@ -14,9 +14,15 @@
   const beadCanvas   = document.getElementById('beadCanvas');
   const hiddenCanvas = document.getElementById('hiddenCanvas');
   const colorSummary = document.getElementById('colorSummary');
-  const downloadBtn  = document.getElementById('downloadBtn');
+  const downloadBtn        = document.getElementById('downloadBtn');
+  const downloadCsvBtn      = document.getElementById('downloadCsvBtn');
+  const downloadStatsImgBtn = document.getElementById('downloadStatsImgBtn');
 
   let loadedImage = null; // 用户上传的 Image 对象
+  let lastSortedColors = null; // 保存最后一次结果供导出用
+  let lastTotalBeads = 0;
+  let lastBeadW = 0;
+  let lastBeadH = 0;
 
   // ---- 上传区交互 ----
   uploadArea.addEventListener('click', () => fileInput.click());
@@ -52,6 +58,132 @@
     const link = document.createElement('a');
     link.download = '拼豆图纸.png';
     link.href = beadCanvas.toDataURL('image/png');
+    link.click();
+  });
+
+  // ---- 导出 CSV ----
+  downloadCsvBtn.addEventListener('click', () => {
+    if (!lastSortedColors) return;
+    const BOM = '\uFEFF'; // Excel UTF-8 BOM
+    const header = '序号,色号,HEX,RGB,数量,占比';
+    const rows = lastSortedColors.map((c, i) =>
+      `${i + 1},${c.id},${c.hex},"rgb(${c.rgb.join(',')})",${c.count},${((c.count / lastTotalBeads) * 100).toFixed(1)}%`
+    );
+    const summary = `\n汇总,,,,${lastTotalBeads},100%\n图纸尺寸,横${lastBeadW}格 x 纵${lastBeadH}格,,颜色种数,${lastSortedColors.length},`;
+    const csv = BOM + header + '\n' + rows.join('\n') + summary;
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.download = '拼豆颜色统计.csv';
+    link.href = URL.createObjectURL(blob);
+    link.click();
+    URL.revokeObjectURL(link.href);
+  });
+
+  // ---- 导出统计图 PNG ----
+  downloadStatsImgBtn.addEventListener('click', () => {
+    if (!lastSortedColors) return;
+    const colors = lastSortedColors;
+    const ROW_H = 28;
+    const COL_WIDTHS = [50, 40, 60, 90, 70, 70]; // #, 色块, 色号, HEX, 数量, 占比
+    const TABLE_W = COL_WIDTHS.reduce((s, w) => s + w, 0);
+    const HEADER_H = 36;
+    const TITLE_H = 40;
+    const PADDING = 16;
+    const TABLE_H = HEADER_H + colors.length * ROW_H;
+    const canvasW = TABLE_W + PADDING * 2;
+    const canvasH = TITLE_H + TABLE_H + PADDING * 2;
+
+    const c = document.createElement('canvas');
+    c.width = canvasW;
+    c.height = canvasH;
+    const ctx = c.getContext('2d');
+
+    // 背景
+    ctx.fillStyle = '#FFFFFF';
+    ctx.fillRect(0, 0, canvasW, canvasH);
+
+    // 标题
+    ctx.fillStyle = '#333';
+    ctx.font = 'bold 16px Arial, sans-serif';
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(
+      `颜色用量统计（${colors.length} 种，${lastTotalBeads.toLocaleString()} 颗，${lastBeadW}×${lastBeadH}）`,
+      PADDING, TITLE_H / 2
+    );
+
+    const ox = PADDING;
+    const oy = TITLE_H;
+
+    // 表头
+    ctx.fillStyle = '#f0f0f0';
+    ctx.fillRect(ox, oy, TABLE_W, HEADER_H);
+    ctx.strokeStyle = '#ccc';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(ox, oy, TABLE_W, HEADER_H);
+
+    const headers = ['#', '色块', '色号', 'HEX', '数量', '占比'];
+    ctx.fillStyle = '#333';
+    ctx.font = 'bold 13px Arial, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    let hx = ox;
+    headers.forEach((h, i) => {
+      ctx.fillText(h, hx + COL_WIDTHS[i] / 2, oy + HEADER_H / 2);
+      hx += COL_WIDTHS[i];
+    });
+
+    // 数据行
+    ctx.font = '12px Arial, sans-serif';
+    colors.forEach((clr, i) => {
+      const ry = oy + HEADER_H + i * ROW_H;
+      // 斑马纹背景
+      if (i % 2 === 1) {
+        ctx.fillStyle = '#fafafa';
+        ctx.fillRect(ox, ry, TABLE_W, ROW_H);
+      }
+      ctx.strokeStyle = '#e5e5e5';
+      ctx.strokeRect(ox, ry, TABLE_W, ROW_H);
+
+      let cx = ox;
+      const cy = ry + ROW_H / 2;
+
+      // #
+      ctx.fillStyle = '#333';
+      ctx.textAlign = 'center';
+      ctx.fillText(String(i + 1), cx + COL_WIDTHS[0] / 2, cy);
+      cx += COL_WIDTHS[0];
+
+      // 色块
+      const swatchSize = 16;
+      ctx.fillStyle = clr.hex;
+      ctx.fillRect(cx + (COL_WIDTHS[1] - swatchSize) / 2, cy - swatchSize / 2, swatchSize, swatchSize);
+      ctx.strokeStyle = '#ccc';
+      ctx.strokeRect(cx + (COL_WIDTHS[1] - swatchSize) / 2, cy - swatchSize / 2, swatchSize, swatchSize);
+      cx += COL_WIDTHS[1];
+
+      // 色号
+      ctx.fillStyle = '#333';
+      ctx.font = 'bold 12px Arial, sans-serif';
+      ctx.fillText(clr.id, cx + COL_WIDTHS[2] / 2, cy);
+      cx += COL_WIDTHS[2];
+
+      // HEX
+      ctx.font = '12px Arial, sans-serif';
+      ctx.fillText(clr.hex, cx + COL_WIDTHS[3] / 2, cy);
+      cx += COL_WIDTHS[3];
+
+      // 数量
+      ctx.fillText(String(clr.count), cx + COL_WIDTHS[4] / 2, cy);
+      cx += COL_WIDTHS[4];
+
+      // 占比
+      ctx.fillText(((clr.count / lastTotalBeads) * 100).toFixed(1) + '%', cx + COL_WIDTHS[5] / 2, cy);
+    });
+
+    const link = document.createElement('a');
+    link.download = '拼豆颜色统计.png';
+    link.href = c.toDataURL('image/png');
     link.click();
   });
 
@@ -129,21 +261,31 @@
     oCtx.imageSmoothingEnabled = true;
     oCtx.drawImage(loadedImage, 0, 0, thumbW, thumbH);
 
-    // 4. 绘制拼豆图纸（每个像素 → CELL×CELL 正方形格子 + 居中色号文本）
-    beadCanvas.width  = beadW * CELL;
-    beadCanvas.height = beadH * CELL;
+    // 4. 绘制拼豆图纸（每个像素 → CELL×CELL 正方形格子 + 居中色号文本 + 坐标轴）
+    // 坐标标签区域大小
+    const labelFontSize = Math.max(8, Math.floor(CELL * 0.48));
+    const MARGIN = Math.max(CELL, labelFontSize * 2.5); // 坐标标签留白
+
+    beadCanvas.width  = beadW * CELL + MARGIN * 2; // 左右各留 MARGIN
+    beadCanvas.height = beadH * CELL + MARGIN * 2; // 上下各留 MARGIN
     const bCtx = beadCanvas.getContext('2d');
 
-    // 根据格子大小动态计算字号（保证文字不溢出格子）
+    // 背景填白
+    bCtx.fillStyle = '#FFFFFF';
+    bCtx.fillRect(0, 0, beadCanvas.width, beadCanvas.height);
+
+    // 根据格子大小动态计算色号字号
     const fontSize = Math.max(6, Math.floor(CELL * 0.52));
+
+    // ---- 绘制网格内容 ----
     bCtx.textAlign    = 'center';
     bCtx.textBaseline = 'middle';
 
     for (let y = 0; y < beadH; y++) {
       for (let x = 0; x < beadW; x++) {
         const color = grid[y][x];
-        const px = x * CELL;
-        const py = y * CELL;
+        const px = MARGIN + x * CELL;
+        const py = MARGIN + y * CELL;
 
         // 格子底色
         bCtx.fillStyle = color.hex;
@@ -161,6 +303,27 @@
       }
     }
 
+    // ---- 绘制坐标标签 ----
+    bCtx.fillStyle = '#333';
+    bCtx.font = `${labelFontSize}px Arial, sans-serif`;
+    bCtx.textAlign = 'center';
+    bCtx.textBaseline = 'middle';
+
+    // 列号（上方 + 下方）
+    for (let x = 0; x < beadW; x++) {
+      const cx = MARGIN + x * CELL + CELL / 2;
+      bCtx.fillText(String(x + 1), cx, MARGIN / 2);                         // 上
+      bCtx.fillText(String(x + 1), cx, MARGIN + beadH * CELL + MARGIN / 2); // 下
+    }
+
+    // 行号（左侧 + 右侧）
+    bCtx.textAlign = 'center';
+    for (let y = 0; y < beadH; y++) {
+      const cy = MARGIN + y * CELL + CELL / 2;
+      bCtx.fillText(String(y + 1), MARGIN / 2, cy);                         // 左
+      bCtx.fillText(String(y + 1), MARGIN + beadW * CELL + MARGIN / 2, cy); // 右
+    }
+
     // 5. 颜色用量汇总
     const totalBeads = beadW * beadH;
     const sortedColors = Object.entries(colorCount)
@@ -169,6 +332,12 @@
         const c = PALETTE.find((p) => p.id === id);
         return { ...c, count };
       });
+
+    // 保存结果供导出使用
+    lastSortedColors = sortedColors;
+    lastTotalBeads = totalBeads;
+    lastBeadW = beadW;
+    lastBeadH = beadH;
 
     const tableRows = sortedColors
       .map(
