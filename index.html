@@ -19,7 +19,7 @@
 
       <div class="settings">
         <label>
-          图纸宽度（珠子数）：
+          图纸宽度（珠子数，纵向格子数 = 横向格子数 × (原图高度 / 原图宽度) ）：
           <input type="number" id="beadWidth" value="64" min="1" max="200">
         </label>
         <label>
@@ -48,6 +48,13 @@
         </div>
         <div class="preview-col preview-col--bead">
           <h3>拼豆图纸（带色号）</h3>
+          <div class="thumbnail-section">
+            <h4>图纸预览</h4>
+            <div class="thumbnail-wrap">
+              <img id="beadThumbnail" alt="图纸缩略图" style="display:none;" />
+            </div>
+          </div>
+          <h4>图纸详情（可滚动查看）</h4>
           <div class="canvas-scroll-wrapper">
             <canvas id="beadCanvas"></canvas>
           </div>
