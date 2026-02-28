@@ -60,12 +60,26 @@ Page({
     });
   },
 
-  onBeadWidthChange(e) {
-    this.setData({ beadWidth: parseInt(e.detail.value, 10) || 64 });
+  onBeadWidthBlur(e) {
+    const raw = e.detail.value.trim();
+    const v = parseInt(raw, 10);
+    if (!raw || isNaN(v) || v < 1 || v > 500) {
+      wx.showToast({ title: '图纸宽度请输入 1～500 的整数', icon: 'none' });
+      this.setData({ beadWidth: this.data.beadWidth }); // 还原上次值
+      return;
+    }
+    this.setData({ beadWidth: v });
   },
 
-  onCellSizeChange(e) {
-    this.setData({ cellSize: parseInt(e.detail.value, 10) || 25 });
+  onCellSizeBlur(e) {
+    const raw = e.detail.value.trim();
+    const v = parseInt(raw, 10);
+    if (!raw || isNaN(v) || v < 5 || v > 100) {
+      wx.showToast({ title: '格子大小请输入 5～100 的整数', icon: 'none' });
+      this.setData({ cellSize: this.data.cellSize }); // 还原上次值
+      return;
+    }
+    this.setData({ cellSize: v });
   },
 
   onAlgorithmChange(e) {

@@ -15,12 +15,12 @@
   <!-- 设置面板 -->
   <view class="settings">
     <view class="setting-row">
-      <text class="setting-label">图纸宽度（珠子数）：</text>
-      <input type="number" value="{{beadWidth}}" bindinput="onBeadWidthChange" class="setting-input" />
+      <text class="setting-label">图纸宽度（珠子数，纵向格子数 = 横向格子数 × (原图高度 / 原图宽度) ）：</text>
+      <input type="number" value="{{beadWidth}}" bindblur="onBeadWidthBlur" placeholder="1～500" class="setting-input" />
     </view>
     <view class="setting-row">
-      <text class="setting-label">格子大小（像素）：</text>
-      <input type="number" value="{{cellSize}}" bindinput="onCellSizeChange" class="setting-input" />
+      <text class="setting-label">格子大小（像素，只影响图纸显示，不影响实际珠子数量）：</text>
+      <input type="number" value="{{cellSize}}" bindblur="onCellSizeBlur" placeholder="5～100" class="setting-input" />
     </view>
     <view class="setting-row">
       <text class="setting-label">颜色匹配算法：</text>
@@ -39,6 +39,20 @@
     <!-- 尺寸说明 -->
     <view class="bead-info">
       <text>图纸尺寸：横向 {{beadW}} 格 × 纵向 {{beadH}} 格，共需 {{totalBeads}} 颗豆子</text>
+    </view>
+
+    <!-- 缩略图预览 -->
+    <view class="section">
+      <text class="section-title">图纸预览</text>
+      <view class="thumbnail-wrap">
+        <image
+          wx:if="{{beadImagePath}}"
+          src="{{beadImagePath}}"
+          class="thumbnail-img"
+          mode="aspectFit"
+          show-menu-by-longpress="{{true}}"
+        />
+      </view>
     </view>
 
     <!-- 图纸展示 -->
