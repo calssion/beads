@@ -1,0 +1,94 @@
+<!-- pages/index/index.wxml -->
+<view class="container">
+  <view class="header">
+    <text class="title">🎨 拼豆图纸生成器</text>
+    <text class="subtitle">上传图片，自动生成 Perler Beads 拼豆图纸</text>
+  </view>
+
+  <!-- 上传区 -->
+  <view class="upload-area" bindtap="chooseImage">
+    <text wx:if="{{!imagePath}}">点击选择图片</text>
+    <image wx:if="{{imagePath}}" src="{{imagePath}}" mode="aspectFit" class="preview-thumb" />
+    <text wx:if="{{imagePath}}" class="file-info">{{imageInfo}}</text>
+  </view>
+
+  <!-- 设置面板 -->
+  <view class="settings">
+    <view class="setting-row">
+      <text class="setting-label">图纸宽度（珠子数）：</text>
+      <input type="number" value="{{beadWidth}}" bindinput="onBeadWidthChange" class="setting-input" />
+    </view>
+    <view class="setting-row">
+      <text class="setting-label">格子大小（像素）：</text>
+      <input type="number" value="{{cellSize}}" bindinput="onCellSizeChange" class="setting-input" />
+    </view>
+    <view class="setting-row">
+      <text class="setting-label">颜色匹配算法：</text>
+      <picker bindchange="onAlgorithmChange" value="{{algorithmIndex}}" range="{{algorithms}}" range-key="name">
+        <view class="picker-value">{{algorithms[algorithmIndex].name}} ▼</view>
+      </picker>
+    </view>
+
+    <button class="btn-generate" bindtap="generate" disabled="{{!imagePath || generating}}">
+      {{generating ? '生成中...' : '生成图纸'}}
+    </button>
+  </view>
+
+  <!-- 结果区域 -->
+  <block wx:if="{{generated}}">
+    <!-- 尺寸说明 -->
+    <view class="bead-info">
+      <text>图纸尺寸：横向 {{beadW}} 格 × 纵向 {{beadH}} 格，共需 {{totalBeads}} 颗豆子</text>
+    </view>
+
+    <!-- 图纸展示 -->
+    <view class="section">
+      <text class="section-title">拼豆图纸（带色号）</text>
+      <scroll-view class="canvas-scroll" scroll-x scroll-y>
+        <image
+          wx:if="{{beadImagePath}}"
+          src="{{beadImagePath}}"
+          style="width:{{canvasWidth}}px;height:{{canvasHeight}}px;"
+          mode="widthFix"
+          show-menu-by-longpress="{{true}}"
+        />
+      </scroll-view>
+    </view>
+
+    <!-- 操作按钮 -->
+    <view class="action-bar">
+      <button class="btn-download" bindtap="saveBeadImage">📥 保存图纸</button>
+      <button class="btn-export" bindtap="saveStatsImage">🖼️ 保存统计图</button>
+    </view>
+
+    <!-- 颜色统计 -->
+    <view class="section">
+      <text class="section-title">颜色用量统计（共 {{colorStats.length}} 种颜色，{{totalBeads}} 颗珠子）</text>
+      <view class="stats-table">
+        <view class="stats-header">
+          <text class="col-num">#</text>
+          <text class="col-swatch">色块</text>
+          <text class="col-id">色号</text>
+          <text class="col-hex">HEX</text>
+          <text class="col-count">数量</text>
+          <text class="col-pct">占比</text>
+        </view>
+        <view class="stats-row {{index % 2 === 1 ? 'stats-row-alt' : ''}}" wx:for="{{colorStats}}" wx:key="id">
+          <text class="col-num">{{index + 1}}</text>
+          <view class="col-swatch">
+            <view class="swatch" style="background-color:{{item.hex}};"></view>
+          </view>
+          <text class="col-id bold">{{item.id}}</text>
+          <text class="col-hex">{{item.hex}}</text>
+          <text class="col-count">{{item.count}}</text>
+          <text class="col-pct">{{item.pct}}</text>
+        </view>
+      </view>
+    </view>
+  </block>
+
+  <!-- 离屏 canvas -->
+  <canvas type="2d" id="beadCanvas" style="position:fixed;left:-9999px;top:-9999px;width:{{canvasWidth}}px;height:{{canvasHeight}}px;" />
+  <canvas type="2d" id="hiddenCanvas" style="position:fixed;left:-9999px;top:-9999px;width:{{hiddenW}}px;height:{{hiddenH}}px;" />
+  <canvas type="2d" id="statsCanvas" style="position:fixed;left:-9999px;top:-9999px;width:{{statsCanvasW}}px;height:{{statsCanvasH}}px;" />
+</view>
