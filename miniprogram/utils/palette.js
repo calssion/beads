@@ -1,4 +1,4 @@
-/**
+﻿/**
  * 拼豆调色板 — MARD 221 全色 (A/B/C/D/E/F/G/H/M 系列)
  * 格式: { id: string, hex: string, rgb: [r, g, b] }
  * 色值来自 MARD 官方 211/221 标准色卡，确保与实物色号一致。
@@ -244,3 +244,6 @@ const PALETTE = [
   { id: 'M14', hex: '#C77362', rgb: [199, 115,  98] },
   { id: 'M15', hex: '#757D7B', rgb: [117, 125, 123] },
 ];
+
+
+module.exports = PALETTE;

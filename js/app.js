@@ -194,6 +194,14 @@
       const img = new Image();
       img.onload = () => {
         loadedImage = img;
+        // 显示图片预览
+        let previewImg = uploadArea.querySelector('img.upload-preview');
+        if (!previewImg) {
+          previewImg = document.createElement('img');
+          previewImg.className = 'upload-preview';
+          uploadArea.appendChild(previewImg);
+        }
+        previewImg.src = e.target.result;
         uploadArea.querySelector('p').textContent = `✅ ${file.name} (${img.width}×${img.height})`;
         const preview = document.getElementById('uploadPreview');
         preview.src = e.target.result;
